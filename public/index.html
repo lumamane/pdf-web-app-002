@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Media Manager</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .folder-button {
+            margin: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        #filterInput {
+            margin-bottom: 10px;
+            padding: 5px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <h1>PDF Management App</h1>
+    <input type="file" id="fileInput" multiple>
+    <br><br>
+    <select id="subfolderSelect">
+        <option value="">Uncategorized</option>
+    </select>
+    <button id="uploadButton">Upload</button>
+
+    <h2>PDF Files</h2>
+    <input type="text" id="filterInput" placeholder="Filter files...">
+    <div id="folderButtons"></div>
+    <table>
+        <thead>
+            <tr>
+                <th>Folder</th>
+                <th>File Name</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="fileList"></tbody>
+    </table>
+  <script>
+ $(document).ready(function () {
+    loadSubfolders();
+    loadFiles('all');
+
+    $('#filterInput').on('input', function () {
+        const filter = $(this).val().toLowerCase();
+        $('#fileList tr').filter(function () {
+            $(this).toggle($(this).text().toLowerCase().indexOf(filter) > -1);
+        });
+    });
+
+    $('#uploadButton').click(function () {
+        const subfolder = $('#subfolderSelect').val();
+        uploadToSubfolder(subfolder);
+    });
+});
+
+const loadSubfolders = () => {
+    $.get('/subfolders', function (subfolders) {
+        $('#folderButtons').empty();
+        $('#subfolderSelect').empty();
+        $('#folderButtons').append('<button class="folder-button" onclick="loadFiles(\'all\')">All</button>');
+        $('#subfolderSelect').append('<option value="">Uncategorized</option>');
+        subfolders.forEach(subfolder => {
+            $('#folderButtons').append(`<button class="folder-button" onclick="loadFiles('${encodeURIComponent(subfolder)}')">${subfolder}</button>`);
+            $('#subfolderSelect').append(`<option value="${encodeURIComponent(subfolder)}">${subfolder}</option>`);
+        });
+    });
+};
+
+const loadFiles = (folder) => {
+    const endpoint = folder === 'all' ? '/list' : `/list/${folder}`;
+    $.get(endpoint, function (files) {
+        displayFiles(files);
+    }).fail(function (error) {
+        console.error('Error loading files:', error);
+        alert('Error loading files.');
+    });
+};
+
+const displayFiles = (files) => {
+    $('#fileList').empty();
+    files.forEach(file => {
+        const inputString = escapeHtml(file);
+        const [foldername, filename] = splitFilePath(inputString);
+        $('#fileList').append(`
+            <tr>
+                <td>${foldername || ''}</td>
+                <td>${filename}</td>
+                <td>
+                    <button onclick="readPDF('${encodeURIComponent(file)}')">Read</button>
+                    <button onclick="renamePDF('${encodeURIComponent(file)}')">Rename</button>
+                    <button onclick="movePDF('${encodeURIComponent(file)}')">Move</button>
+                    <button onclick="deletePDF('${encodeURIComponent(file)}')">Delete</button>
+                    </td>
+            </tr>
+        `);
+    });
+};
+
+const uploadToSubfolder = (subfolder) => {
+    const files = $('#fileInput')[0].files;
+    if (files.length === 0) {
+        alert('Please select files to upload.');
+        return;
+    }
+
+    const formData = new FormData();
+    for (let i = 0; i < files.length; i++) {
+        formData.append('pdfFiles', files[i]);
+    }
+
+    $.ajax({
+        url: `/upload/${encodeURIComponent(subfolder)}`,
+        type: 'POST',
+        data: formData,
+        contentType: false,
+        processData: false,
+        success: function (response) {
+            alert(response.message);
+            loadFiles('all');
+        },
+        error: function (error) {
+            alert('Error uploading files.');
+        }
+    });
+};
+
+const readPDF = (filename) => {
+    console.log(filename);
+    console.log(`/pdfs/${encodeURIComponent(filename)}`); 
+    window.open(`/pdfs/${filename}`, '_blank');
+};
+
+const deletePDF = (filename) => {
+    if (confirm(`Are you sure you want to delete ${decodeURIComponent(filename)}?`)) {
+        $.ajax({
+            //url: `/delete/${encodeURIComponent(filename)}`,
+            url: `/delete/${filename}`,
+            type: 'DELETE',
+            success: function (response) {
+                alert(response);
+                loadFiles('all');
+            },
+            error: function (error) {
+                alert('Error deleting file.');
+            }
+        });
+    }
+};
+
+const renamePDF = (filename) => {
+    const originalFilename = decodeURIComponent(filename);
+    const [folder, filenameOnly] = splitFilePath(originalFilename);
+    const newFilename = prompt('Enter new filename:', filenameOnly);
+
+    if (newFilename) {
+        const newFullFilename = folder ? `${folder}/${newFilename}` : newFilename;
+
+        $.ajax({
+            url: `/rename`,
+            type: 'PUT',
+            contentType: 'application/json',
+            data: JSON.stringify({ oldFilename: originalFilename, newFilename: newFullFilename }),
+            success: function (response) {
+                alert(response.message);
+
+                // Extract folder from the new file path and reload it
+                const newFolder = splitFilePath(response.newRelativePath)[0];
+                if (newFolder) {
+                    loadFiles(encodeURIComponent(newFolder));
+                } else {
+                    loadFiles('all');
+                }
+            },
+            error: function (error) {
+                alert('Error renaming file.');
+                console.error(error);
+            }
+        });
+    }
+};
+
+const movePDF = (filename) => {
+    const originalFilename = decodeURIComponent(filename);
+    const newFolder = prompt('Enter the folder to move to:', '');
+    if (newFolder) {
+        $.ajax({
+            url: `/move`,
+            type: 'PUT',
+            contentType: 'application/json',
+            data: JSON.stringify({ oldFilename: originalFilename, newFolder: encodeURIComponent(newFolder) }),
+            success: function (response) {
+                alert(response);
+                loadFiles('all');
+            },
+            error: function (error) {
+                alert('Error moving file.');
+                console.error(error);
+            }
+        });
+    }
+};
+
+const splitFilePath = (filePath) => {
+    const parts = filePath.split('\\');
+    const filename = parts.pop();
+    const foldername = parts.join('\\');
+    return [foldername || '', filename];
+};
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.innerText = text;
+    return div.innerHTML;
+}
+
+  </script>
+</body>
+</html>
