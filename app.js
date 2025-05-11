@@ -225,6 +225,10 @@ app.listen(PORT, '0.0.0.0', async () => {
     const url = `http://${ipAddress}:${PORT}`;
     console.log(`Server is running on ${url}`);
     
+    const ipAddress_WLAN = getIPAddress_WLAN();
+    const url_wlan = `http://${ipAddress_WLAN}:${PORT}`;
+    console.log(`Server is running on ${url_wlan} (WLAN)`);
+
     // Use dynamic import to open the browser
     const { default: open } = await import('open');
     open(url);
@@ -241,3 +245,20 @@ function getIPAddress() {
     }
     return '127.0.0.1';
 }
+
+function getIPAddress_WLAN() { 
+    const interfaces = os.networkInterfaces();
+    const wlan0Interface = interfaces['wlan0'];
+
+    // Find the IPv4 address associated with wlan0
+    let ipAddress;
+    if (wlan0Interface && wlan0Interface.length > 0) {
+        const wlan0IPv4 = wlan0Interface.find(interface => interface.family === 'IPv4');
+        if (wlan0IPv4) {
+            ipAddress = wlan0IPv4.address;
+        }
+    }
+    return ipAddress;
+}
+
+
