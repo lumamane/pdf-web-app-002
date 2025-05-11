@@ -5,7 +5,7 @@ txt
 fotos
 videos
 
-even html (documents ore single-filed tool)s:
+even html (documents ore single-filed tools):
 
 
 
