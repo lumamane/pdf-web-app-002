@@ -1,25 +1,32 @@
+This project lets you easily upload, organize, and access your media files—all from your own local "cloud" with just one click.
 
-This Project allows you to 
-upload, 
-organize
-and consume your media files (with one click)  
-in your own local "cloud".
+You can run this media server anywhere Node.js is supported:
 
-You can run this media file server, whereever node.js runs:
-desktop, 
-laptop, 
-raspberry pi, 
-even on a Android device (using termux) for a "mobile" cloud.
+    Desktop
 
-Access your media files from any device in the same network.
-Very helpful, if you have files on several devices, you would want to have in one place.
+    Laptop
 
-Collect and enjoy everything (you can open directly in your browser):
-pdf
-txt
-fotos
-videos
-html (documents ore single-filed tools)
-epub (books)
-    Chrome: You can use extensions like "EPUBReader" or "Readium" which allow you to open and read EPUB files directly in your browser.
-    Firefox: Similar extensions are available for Firefox as well.
+    Raspberry Pi
+
+    Even an Android device (via Termux) for a truly mobile cloud
+
+Access your files from any device on the same network. It's perfect for consolidating media stored across multiple devices into one centralized location.
+
+Supported file types (open directly in your browser):
+
+    PDF
+
+    TXT
+
+    Photos
+
+    Videos
+
+    HTML (documents or single-file tools)
+
+    EPUB (ebooks)
+
+        Chrome: Use extensions like EPUBReader or Readium
+
+        Firefox: Similar add-ons are available
+
