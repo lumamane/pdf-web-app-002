@@ -1,1 +1,11 @@
-it makes sense to upload file you can open in a browser.
+it makes sense to upload only files you can open in a browser.
+
+pdf
+txt
+fotos
+videos
+
+even html (documents ore single-filed tool)s:
+
+
+
