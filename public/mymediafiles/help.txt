@@ -6,5 +6,7 @@ fotos
 videos
 html (documents ore single-filed tools):
 
-
+epub (books)
+    Chrome: You can use extensions like "EPUBReader" or "Readium" which allow you to open and read EPUB files directly in your browser.
+    Firefox: Similar extensions are available for Firefox as well.
 
