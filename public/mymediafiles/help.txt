@@ -1,0 +1,1 @@
+it makes sense to upload file you can open in a browser.

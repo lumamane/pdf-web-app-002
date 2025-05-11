@@ -102,7 +102,7 @@ const displayFiles = (files) => {
                 <td>${foldername || ''}</td>
                 <td>${filename}</td>
                 <td>
-                    <button onclick="readPDF('${encodeURIComponent(file)}')">Read</button>
+                    <button onclick="readPDF('${encodeURIComponent(file)}')">Open</button>
                     <button onclick="renamePDF('${encodeURIComponent(file)}')">Rename</button>
                     <button onclick="movePDF('${encodeURIComponent(file)}')">Move</button>
                     <button onclick="deletePDF('${encodeURIComponent(file)}')">Delete</button>
@@ -142,14 +142,13 @@ const uploadToSubfolder = (subfolder) => {
 
 const readPDF = (filename) => {
     console.log(filename);
-    console.log(`/pdfs/${encodeURIComponent(filename)}`); 
-    window.open(`/pdfs/${filename}`, '_blank');
+    console.log(`/mymediafiles/${encodeURIComponent(filename)}`); 
+    window.open(`/mymediafiles/${filename}`, '_blank');
 };
 
 const deletePDF = (filename) => {
     if (confirm(`Are you sure you want to delete ${decodeURIComponent(filename)}?`)) {
         $.ajax({
-            //url: `/delete/${encodeURIComponent(filename)}`,
             url: `/delete/${filename}`,
             type: 'DELETE',
             success: function (response) {

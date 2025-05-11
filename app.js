@@ -57,7 +57,7 @@ const setStorage = (req, res, next) => {
     const storage = multer.diskStorage(
     {
         destination: (req, file, cb) => {
-            const uploadPath = subfolder ? path.join('./public/pdfs', subfolder) : './public/pdfs';
+            const uploadPath = subfolder ? path.join('./public/mymediafiles', subfolder) : './public/mymediafiles';
             cb(null, uploadPath);
         },
         filename: (req, file, cb) => {
@@ -83,7 +83,7 @@ app.post('/upload/:subfolder?', setStorage, (req, res) => {
 
 app.delete('/delete/*', async (req, res) => {
     const filename = req.params[0]; // Do not decode
-    const filePath = path.join(__dirname, 'public', 'pdfs', filename);
+    const filePath = path.join(__dirname, 'public', 'mymediafiles', filename);
     try {
         const exists = await fs.pathExists(filePath);
         if (!exists) {
@@ -99,8 +99,8 @@ app.delete('/delete/*', async (req, res) => {
 
 app.put('/rename', express.json(), async (req, res) => {
     const { oldFilename, newFilename } = req.body;
-    const oldFilePath = path.join(__dirname, 'public', 'pdfs', decodeURIComponent(oldFilename));
-    const newFilePath = path.join(__dirname, 'public', 'pdfs', decodeURIComponent(newFilename));
+    const oldFilePath = path.join(__dirname, 'public', 'mymediafiles', decodeURIComponent(oldFilename));
+    const newFilePath = path.join(__dirname, 'public', 'mymediafiles', decodeURIComponent(newFilename));
 
     try {
         const exists = await fs.pathExists(oldFilePath);
@@ -115,7 +115,7 @@ app.put('/rename', express.json(), async (req, res) => {
         await fs.rename(oldFilePath, newFilePath);
 
         // Return the updated folder structure
-        const newRelativePath = path.relative('./public/pdfs', newFilePath);
+        const newRelativePath = path.relative('./public/mymediafiles', newFilePath);
         res.status(200).json({ message: 'File renamed successfully!', newRelativePath });
     } catch (err) {
         console.error(err);
@@ -126,8 +126,8 @@ app.put('/rename', express.json(), async (req, res) => {
 
 app.put('/move', express.json(), async (req, res) => {
     const { oldFilename, newFolder } = req.body;
-    const oldFilePath = path.join(__dirname, 'public', 'pdfs', decodeURIComponent(oldFilename));
-    const newFilePath = path.join(__dirname, 'public', 'pdfs', newFolder, path.basename(decodeURIComponent(oldFilename)));
+    const oldFilePath = path.join(__dirname, 'public', 'mymediafiles', decodeURIComponent(oldFilename));
+    const newFilePath = path.join(__dirname, 'public', 'mymediafiles', newFolder, path.basename(decodeURIComponent(oldFilename)));
 
     try {
         const exists = await fs.pathExists(oldFilePath);
@@ -156,8 +156,8 @@ app.put('/move', express.json(), async (req, res) => {
 
 app.get('/list', async (req, res) => {
     try {
-        const files = await listFilesRecursively('./public/pdfs');
-        const relativeFiles = files.map(file => path.relative('./public/pdfs', file));
+        const files = await listFilesRecursively('./public/mymediafiles');
+        const relativeFiles = files.map(file => path.relative('./public/mymediafiles', file));
         res.json(relativeFiles);
     } catch (err) {
         console.error(err);
@@ -168,8 +168,8 @@ app.get('/list', async (req, res) => {
 /*
 app.get('/list/uncategorized', async (req, res) => {
     try {
-        const files = await listFilesExcludingSubdirectories('./public/pdfs');
-        const relativeFiles = files.map(file => path.relative('./public/pdfs', file));
+        const files = await listFilesExcludingSubdirectories('./public/mymediafiles');
+        const relativeFiles = files.map(file => path.relative('./public/mymediafiles', file));
         res.json(relativeFiles);
     } catch (err) {
         console.error(err);
@@ -195,8 +195,8 @@ async function listFilesExcludingSubdirectories(dir) {
 app.get('/list/:subfolder', async (req, res) => {
     const subfolder = req.params.subfolder;
     try {
-        const files = await listFilesRecursively(`./public/pdfs/${subfolder}`);
-        const relativeFiles = files.map(file => path.relative('./public/pdfs', file));
+        const files = await listFilesRecursively(`./public/mymediafiles/${subfolder}`);
+        const relativeFiles = files.map(file => path.relative('./public/mymediafiles', file));
         res.json(relativeFiles);
     } catch (err) {
         console.error(err);
@@ -207,7 +207,7 @@ app.get('/list/:subfolder', async (req, res) => {
 app.get('/subfolders', async (req, res) => {
     try {
         const subfolders = [];
-        const items = await fs.readdir('./public/pdfs', { withFileTypes: true });
+        const items = await fs.readdir('./public/mymediafiles', { withFileTypes: true });
         for (const item of items) {
             if (item.isDirectory()) {
                 subfolders.push(item.name);
