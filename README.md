@@ -1,6 +1,6 @@
-This project lets you easily upload, organize, and access your media files—all from your own local "cloud" with just one click.
+This project lets you easily upload, organize, and access your media files—all to and from your own local "cloud" with just one click.
 
-You can run this media server anywhere Node.js is supported:
+You can run this simple media server anywhere Node.js is supported:
 
     Desktop
 
@@ -10,7 +10,7 @@ You can run this media server anywhere Node.js is supported:
 
     Even an Android device (via Termux) for a truly mobile cloud
 
-Access your files from any device on the same network. It's perfect for consolidating media stored across multiple devices into one centralized location.
+Access your files from any device on the same network. It's perfect for consolidating media stored across multiple devices into one place.
 
 Supported file types (open directly in your browser):
 
