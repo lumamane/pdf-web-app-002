@@ -1,4 +1,4 @@
-This project lets you easily upload, organize, and access your media files—all to and from your own local "cloud" with just one click.
+This web app lets you easily upload, organize, and access your media files—all to and from your own local "cloud" with just one click.
 
 You can run this simple media server anywhere Node.js is supported:
 
